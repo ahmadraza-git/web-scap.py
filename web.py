@@ -3,7 +3,6 @@ import pandas as pd
 # Import necessary libraries
 import requests
 from bs4 import BeautifulSoup
-import streamlit as st
 
 # Define the web scraping function
 def scrape_website(url):
@@ -15,30 +14,17 @@ def scrape_website(url):
 
     # Scrape the desired data from the website
     # Modify this section according to your specific requirements
-    title = soup.find('h1').text
-    description = soup.find('p').text
+    data = soup.find('div', class_='example-class').text.strip()
 
     # Return the scraped data
-    return title, description
+    return data
 
-# Create a Streamlit app
-def main():
-    # Set the title of the app
-    st.title("Web Scraping App")
+# URL of the website to scrape
+url = "https://example.com"
 
-    # Get the user input URL
-    url = st.text_input("Enter the URL of the website to scrape:")
+# Call the web scraping function
+scraped_data = scrape_website(url)
 
-    # Check if the user has entered a URL
-    if url:
-        # Call the web scraping function
-        title, description = scrape_website(url)
-
-        # Display the scraped data
-        st.write("Title:", title)
-        st.write("Description:", description)
-
-# Run the Streamlit app
-if __name__ == '__main__':
-    main()
-
+# Display the scraped data
+print("Scraped Data:")
+print(scraped_data)
