@@ -10,12 +10,14 @@ def scrape_data(url):
     if response.status_code == 200:
         # Create a BeautifulSoup object to parse the HTML content
         soup = BeautifulSoup(response.content, 'html.parser')
+        
 
         # Find the content you want to scrape
         content = soup.find('div', {'id': 'mw-content-text'})
 
         # Extract the text from the content
         text = content.get_text()
+        text = content.get_text('bron','died')
 
         return text
     else:
