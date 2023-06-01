@@ -1,31 +1,33 @@
 import streamlit as st
 from bs4 import BeautifulSoup
 import requests
+import scrapy
 
+class NewsSpider(scrapy.Spider):
+    name = "news_spider"
+    start_urls = [
+        "https://www.example.com/news",
+    ]
 
-def scrape_news():
-    # Send a GET request to the website
-    url = "https://www.example.com/news"
-    response = requests.get(url)
-    
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Create a BeautifulSoup object to parse the HTML content
-        soup = BeautifulSoup(response.content, "html.parser")
-        
-        # Find the HTML elements containing the news articles
-        articles = soup.find_all("div", class_="article")
-        
-        # Extract the title and URL for each article
+    def parse(self, response):
+        # Extract information from the HTML response
+        articles = response.css("div.article")
+
         for article in articles:
-            title = article.find("h2").text.strip()
-            link = article.find("a")["href"]
-            
-            print("Title:", title)
-            print("URL:", link)
-            print("------")
-    else:
-        print("Failed to retrieve news.")
+            title = article.css("h2::text").get().strip()
+            link = article.css("a::attr(href)").get()
 
-# Call the function to start scraping
-scrape_news()
+            yield {
+                "title": title,
+                "link": link,
+            }
+
+        # Follow pagination links
+        next_page = response.css("a.next-page::attr(href)").get()
+        if next_page is not None:
+            yield response.follow(next_page, self.parse)
+
+# Run the spider
+process = scrapy.crawler.CrawlerProcess()
+process.crawl(NewsSpider)
+process.start()
