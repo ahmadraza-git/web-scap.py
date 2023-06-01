@@ -2,31 +2,26 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-def scrape_websites():
-    url = "https://www.octoparse.com/blog/top-10-most-scraped-websites"
+def scrape_car_info():
+    url = "https://en.wikipedia.org/wiki/Car"
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
-    
-    website_list = []
-    websites = soup.find_all("h3", class_="post-title")
-    
-    for website in websites:
-        website_list.append(website.text.strip())
 
-    return website_list
+    # Scrape relevant information
+    car_name = soup.find("h1", id="firstHeading").text
+    car_summary = soup.find("div", class_="mw-parser-output").p.text
+
+    return car_name, car_summary
 
 def main():
-    st.title("Top 10 Most Scraped Websites")
-    st.write("Scraping data from https://www.octoparse.com/blog/top-10-most-scraped-websites")
+    st.title("Car Information Scraper")
+    st.write("Scraping data from https://en.wikipedia.org/wiki/Car")
 
-    websites = scrape_websites()
+    car_name, car_summary = scrape_car_info()
 
-    if websites:
-        st.write("Here are the top 10 most scraped websites:")
-        for i, website in enumerate(websites, start=1):
-            st.write(f"{i}. {website}")
-    else:
-        st.write("Failed to retrieve website data.")
+    st.write(f"Car Name: {car_name}")
+    st.write("Summary:")
+    st.write(car_summary)
 
 if __name__ == "__main__":
     main()
