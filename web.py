@@ -2,34 +2,38 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Fetch the HTML content of the page
-def fetch_page_content(url):
+# Function to scrape data from the provided URL
+def scrape_data(url):
+    # Send a GET request to the URL
     response = requests.get(url)
-    return response.text
 
-# Extract relevant information from the HTML
-def extract_info(html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    # Modify the code below based on the specific information you want to extract
-    # For example, let's extract the page title and the first paragraph
-    title = soup.find('h1', {'id': 'firstHeading'}).text
-    first_paragraph = soup.find('p').text
-    return title, first_paragraph
+    if response.status_code == 200:
+        # Create a BeautifulSoup object to parse the HTML content
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-# Main function to run the web scraper
+        # Find the content you want to scrape
+        content = soup.find('div', {'id': 'mw-content-text'})
+
+        # Extract the text from the content
+        text = content.get_text()
+
+        return text
+    else:
+        return None
+
+# Create the Streamlit app
 def main():
     st.title("Web Scraper")
-    url = "https://simple.wikipedia.org/wiki/Muhammad_Iqbal"
-
-    # Fetch the page content
-    html_content = fetch_page_content(url)
-
-    # Extract relevant information
-    title, first_paragraph = extract_info(html_content)
-
-    # Display the information using Streamlit
-    st.header(title)
-    st.write(first_paragraph)
+    url = st.text_input("Enter the URL:")
+    if st.button("Scrape"):
+        if url:
+            scraped_data = scrape_data(url)
+            if scraped_data:
+                st.text_area("Scraped Data", value=scraped_data)
+            else:
+                st.error("Error: Failed to scrape data. Please check the URL.")
+        else:
+            st.warning("Please enter a URL.")
 
 if __name__ == '__main__':
     main()
