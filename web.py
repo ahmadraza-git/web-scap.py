@@ -1,11 +1,12 @@
 import streamlit as st
-from bs4 import BeautifulSoup
+
+
 import requests
+from bs4 import BeautifulSoup
 
-
-def scrape_news():
+def scrape_products():
     # Send a GET request to the website
-    url = "https://www.example.com/news"
+    url = "https://www.example.com/products"
     response = requests.get(url)
     
     # Check if the request was successful
@@ -13,19 +14,19 @@ def scrape_news():
         # Create a BeautifulSoup object to parse the HTML content
         soup = BeautifulSoup(response.content, "html.parser")
         
-        # Find the HTML elements containing the news articles
-        articles = soup.find_all("div", class_="article")
+        # Find the HTML elements containing the products
+        products = soup.find_all("div", class_="product")
         
-        # Extract the title and URL for each article
-        for article in articles:
-            title = article.find("h2").text.strip()
-            link = article.find("a")["href"]
+        # Extract the title and price for each product
+        for product in products:
+            title = product.find("h2").text.strip()
+            price = product.find("span", class_="price").text.strip()
             
             print("Title:", title)
-            print("URL:", link)
+            print("Price:", price)
             print("------")
     else:
-        print("Failed to retrieve news.")
+        print("Failed to retrieve products.")
 
 # Call the function to start scraping
-scrape_news()
+scrape_products()
