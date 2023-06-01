@@ -1,27 +1,32 @@
 import requests
-import BeautifulSoup
+from bs4 import BeautifulSoup
 import streamlit as st
 
-def scrape_car_info():
-    url = "https://en.wikipedia.org/wiki/Car"
+def scrape_wikipedia(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
-    # Scrape relevant information
-    car_name = soup.find("h1", id="firstHeading").text
-    car_summary = soup.find("div", class_="mw-parser-output").p.text
+    # Extract the desired information from the web page
+    title = soup.find("h1", id="firstHeading").text.strip()
+    paragraphs = soup.find_all("p")
 
-    return car_name, car_summary
+    content = ""
+    for paragraph in paragraphs:
+        content += paragraph.text.strip() + "\n"
+
+    return title, content
 
 def main():
-    st.title("Car Information Scraper")
-    st.write("Scraping data from https://en.wikipedia.org/wiki/Car")
+    st.title("Wikipedia Web Scraper")
+    st.write("Scraping data from Wikipedia")
 
-    car_name, car_summary = scrape_car_info()
+    url = "https://en.wikipedia.org/wiki/Place"
 
-    st.write(f"Car Name: {car_name}")
-    st.write("Summary:")
-    st.write(car_summary)
+    title, content = scrape_wikipedia(url)
+
+    st.write(f"Title: {title}")
+    st.write("Content:")
+    st.write(content)
 
 if __name__ == "__main__":
     main()
